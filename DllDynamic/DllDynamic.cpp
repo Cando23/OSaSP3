@@ -15,5 +15,6 @@ int main()
 		}
 		FreeLibrary(lib);
 	}
+	std::cin.get();
 	return 0;
 }
