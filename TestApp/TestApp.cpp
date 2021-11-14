@@ -1,7 +1,10 @@
 ﻿#include <iostream>
-
+using namespace std;
 int main()
 {
-    std::cout << "Hello World!\n";
+	const char src[] = "ABCDEFG";
+	cout << "Old string: " << src << endl;
+	std::cin.get();
+	cout << "New string: " << src << endl << endl;
     std::cin.get();
 }

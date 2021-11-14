@@ -22,12 +22,12 @@ DWORD GetProcessId(std::string process)
     }
 }
 
-bool Inject(DWORD pid, LPCVOID data, const char* libName, const char* functionName) {
+bool Inject(DWORD pid, const char* data) {
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
     if (!process) return false;
-    int size = strlen("Dll.dll") + 1;
+    int size = strlen(data) + 1;
 
-    LPVOID loadLibrary = (LPVOID)GetProcAddress(LoadLibraryA(libName), functionName);
+    LPVOID loadLibrary = (LPVOID)GetProcAddress(GetModuleHandle(L"Kernel32.dll"), "LoadLibraryA");
     LPVOID memory = (LPVOID)VirtualAllocEx(process, 0, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     WriteProcessMemory(process, (LPVOID)memory, data, size, 0); 
     HANDLE thread = CreateRemoteThread(process, 0, 0, (LPTHREAD_START_ROUTINE)loadLibrary, (LPVOID)memory, 0, 0);
@@ -44,9 +44,9 @@ bool Inject(DWORD pid, LPCVOID data, const char* libName, const char* functionNa
 int main()
 {
     DWORD pID = GetProcessId("TestApp.exe");
-    Inject(pID, "Dll.dll", "Kernel32.dll", "LoadLibraryA");
-    Inject(pID, NULL, "Dll.dll", "DoSomething");
-
+    if (Inject(pID, "DllForInjection.dll"))
     std::cout << "Dll injected" << std::endl;
+    else
+        std::cout << "Dll not injected" << std::endl;
     std::cin.get();
 }

@@ -1,20 +1,26 @@
 ﻿#include "Windows.h"
 #include "iostream"
-typedef void __cdecl DoFunc();
+typedef void __cdecl TReplaceString(DWORD pid, const char* src, const char* res);
+using namespace std;
 int main()
 {
+	DWORD pid = GetCurrentProcessId();
 	HINSTANCE lib;
 	lib = LoadLibrary(L"Dll.dll");
 	if (lib != NULL) {
-		DoFunc* proc = (DoFunc*)GetProcAddress(lib, "DoSomething");
+		TReplaceString* proc = (TReplaceString*)GetProcAddress(lib, "ReplaceString");
 		if (NULL != proc) {
-			proc();
+			const char src[] = "ABCDEFG";
+			const char res[] = "HIGJKLM";
+			cout << "Old string: " << src << endl;
+			proc(pid, src, res);
+			cout << "New string: " << src << endl << endl;
 		}
 		else {
-			std::cout << "NO";
+			cout << "Proc not found";
 		}
 		FreeLibrary(lib);
 	}
-	std::cin.get();
+	cin.get();
 	return 0;
 }
